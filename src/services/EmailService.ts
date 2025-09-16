@@ -6,7 +6,7 @@ import { IEmailService } from '@/interfaces';
 
 export class EmailService implements IEmailService {
 
-    async sendPasswordResetEmail(email: string, resetToken: string, name: string): Promise<boolean> {
+    async sendPasswordResetEmail(email: string, resetToken: string, name: string): Promise<string> {
         const resetLink = `${config.frontendUrl}/reset-password?token=${resetToken}`;
         const html = loadTemplate('resetPassword', { name, resetLink });
 

@@ -81,7 +81,7 @@ export interface ICacheService {
 // Email Service Interface
 export interface IEmailService {
   // sendEmail(to: string, subject: string, content: string): Promise<boolean>;
-  sendPasswordResetEmail(email: string, resetToken: string, name?: string): Promise<boolean>;
+  sendPasswordResetEmail(email: string, resetToken: string, name?: string): Promise<string>;
   sendWelcomeEmail(email: string, firstName: string): Promise<boolean>;
 }
 

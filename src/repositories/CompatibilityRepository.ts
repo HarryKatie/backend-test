@@ -66,11 +66,18 @@ export class CompatibilityRepository {
     }
 
     async getAllMetals(): Promise<string[]> {
-        const docs = await CompatibilityModel.find().select('compatibilities.metal').lean();
+        const docs = await CompatibilityModel.find()
+            .populate('compatibilities.metal', 'name')
+            .lean();
+
         const metalSet = new Set<string>();
         docs.forEach(doc => {
-            doc.compatibilities.forEach(c => metalSet.add(c.metal));
+            doc.compatibilities.forEach(c => {
+                metalSet.add(c.metal.toString()); // 👈 convert ObjectId → string
+            });
         });
+
         return [...metalSet].sort();
     }
+
 }

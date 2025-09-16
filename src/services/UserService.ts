@@ -143,14 +143,13 @@ export class UserService implements IUserService {
     }
 
     // Generate reset token
-    const resetToken = this.authService.generatePasswordResetToken(user._id);
+    const resetToken = await this.authService.generatePasswordResetToken(user._id);
     const fullName = user.firstName + ' ' + user.lastName;
     console.log('resetToken: ', resetToken);
 
 
-    // TODO: Send email with reset token
+    // ✅ Send email
     await this.emailService.sendPasswordResetEmail(email, resetToken, fullName);
-    console.log('email Sending: ', await this.emailService.sendPasswordResetEmail(email, resetToken, fullName));
     logger.info(`Password reset email sent to: ${email}`);
     return true;
   }
