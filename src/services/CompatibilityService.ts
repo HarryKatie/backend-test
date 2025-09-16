@@ -120,7 +120,7 @@ export class CompatibilityService {
         const allMetalsSet = new Set<string>();
 
         entries.forEach(entry => {
-            entry.compatibilities.forEach(c => allMetalsSet.add(c.metalName));
+            entry.compatibilities.forEach(c => allMetalsSet.add(c.metal.toString()));
         });
 
         const metals = [...allMetalsSet].sort();
@@ -131,7 +131,7 @@ export class CompatibilityService {
             };
 
             metals.forEach(metal => {
-                const compatibility = entry.compatibilities.find(c => c.metalName === metal);
+                const compatibility = entry.compatibilities.find(c => c.metal.toString() === metal);
                 row[metal] = compatibility ? compatibility.isCompatible : null;
             });
 

@@ -18,13 +18,14 @@ export class AuthService implements IAuthService {
     return jwt.sign(payload, config.jwt.secret); // ❌ no expiresIn here
   }
 
-  generatePasswordResetToken(userId: string): string {
+  async generatePasswordResetToken(userId: string): Promise<string> {
     return jwt.sign(
       { userId },
       config.jwt.secret,
       { expiresIn: '1h' } // 1 hour
     );
   }
+
 
   async verifyToken(token: string): Promise<IUser | null> {
     try {
