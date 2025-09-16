@@ -15,26 +15,51 @@ export class UserRepository implements IUserRepository {
       throw error;
     }
   }
-
   async findById(id: string): Promise<IUser | null> {
-    const user = await UserModel.findById(id).select('-password');
-    return user ? user.toJSON() : null;
+    const userDoc = await UserModel.findById(id).select('-password');
+    if (!userDoc) return null;
+
+    const user: IUser = {
+      ...userDoc.toObject(),
+      _id: userDoc._id.toString(), // ensure string
+    };
+
+    return user;
   }
 
   async findByEmail(email: string): Promise<IUser | null> {
-    const user = await UserModel.findOne({ email: email.toLowerCase() }).select('-password');
-    return user ? user.toJSON() : null;
+    const userDoc = await UserModel.findOne({ email: email.toLowerCase() }).select('-password');
+    if (!userDoc) return null;
+
+    const user: IUser = {
+      ...userDoc.toObject(),
+      _id: userDoc._id.toString(), // ensure string if IUser expects string
+    };
+
+    return user;
   }
 
   async findByEmailAndPassword(email: string, password: string): Promise<IUser | null> {
-    const user = await UserModel.findOne({ email: email.toLowerCase() }).select('+password');
-    if (!user) return null;
+    const userDoc = await UserModel.findOne({ email: email.toLowerCase() })
+      .select('+password');
 
-    const isPasswordValid = await user.comparePassword(password);
+    if (!userDoc) return null;
+
+    const isPasswordValid = await userDoc.comparePassword(password);
     if (!isPasswordValid) return null;
 
-    return user.toJSON();
+    // convert to plain object
+    const user: IUser = {
+      ...userDoc.toObject(),
+      _id: userDoc._id.toString(), // ensure _id is a string if IUser expects string
+    };
+
+    // strip password explicitly (in case it's in toObject())
+    delete (user as any).password;
+
+    return user;
   }
+
 
   async findAll(options?: PaginationOptions): Promise<PaginatedResult<IUser>> {
     const {
@@ -53,14 +78,20 @@ export class UserRepository implements IUserRepository {
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
         .limit(limit)
-        .lean(),
+        .lean()
+        .exec(),
       UserModel.countDocuments(),
     ]);
+
+    const normalizedUsers: IUser[] = users.map(u => ({
+      ...u,
+      _id: u._id.toString(), // 👈 fix type
+    }));
 
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: users,
+      data: normalizedUsers,
       pagination: {
         page,
         limit,
@@ -70,6 +101,7 @@ export class UserRepository implements IUserRepository {
         hasPrev: page > 1,
       },
     };
+
   }
 
   async update(id: string, data: Partial<IUser>): Promise<IUser | null> {
@@ -78,9 +110,13 @@ export class UserRepository implements IUserRepository {
         id,
         { $set: data },
         { new: true, runValidators: true }
-      ).select('-password');
+      )
+        .select('-password')
+        .lean<IUser>()  // 👈 ensures plain IUser
+        .exec();
 
-      return user ? user.toJSON() : null;
+      return user ?? null;
+
     } catch (error: any) {
       if (error.code === 11000) {
         throw new ConflictError('User with this email already exists');
@@ -138,14 +174,20 @@ export class UserRepository implements IUserRepository {
         .sort({ [sortBy]: sortDirection })
         .skip(skip)
         .limit(limit)
-        .lean(),
-      UserModel.countDocuments({ role }),
+        .lean()
+        .exec(),
+      UserModel.countDocuments(),
     ]);
+
+    const normalizedUsers: IUser[] = users.map(u => ({
+      ...u,
+      _id: u._id.toString(), // 👈 fix type
+    }));
 
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: users,
+      data: normalizedUsers,
       pagination: {
         page,
         limit,
@@ -192,10 +234,15 @@ export class UserRepository implements IUserRepository {
       }),
     ]);
 
+    const normalizedUsers: IUser[] = users.map(u => ({
+      ...u,
+      _id: u._id.toString(), // 👈 fix type
+    }));
+
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: users,
+      data: normalizedUsers,
       pagination: {
         page,
         limit,

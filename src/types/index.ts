@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { Types } from 'mongoose';
 
 // User types
 export interface IUser {
@@ -32,8 +33,8 @@ export interface IProduct {
   price: number;
   category: string;
   stock: number;
-  isActive: boolean;
-  createdBy: string;
+  isActive: boolean;  
+  createdBy: Types.ObjectId | string; // 👈 allow ObjectId in Mongo but string in app
   createdAt: Date;
   updatedAt: Date;
 }

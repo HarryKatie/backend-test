@@ -83,10 +83,15 @@ export class ProductRepository {
       ProductModel.countDocuments(filter),
     ]);
 
+    const normalizedProducts: IProduct[] = products.map(u => ({
+      ...u,
+      _id: u._id.toString(), // 👈 fix type
+    }));
+
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: products,
+      data: normalizedProducts,
       pagination: {
         page,
         limit,
@@ -146,10 +151,15 @@ export class ProductRepository {
       ProductModel.countDocuments({ category, isActive: true }),
     ]);
 
+    const normalizedProducts: IProduct[] = products.map(u => ({
+      ...u,
+      _id: u._id.toString(), // 👈 fix type
+    }));
+
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: products,
+      data: normalizedProducts,
       pagination: {
         page,
         limit,
@@ -182,10 +192,15 @@ export class ProductRepository {
       ProductModel.countDocuments({ stock: { $gt: 0 }, isActive: true }),
     ]);
 
+    const normalizedProducts: IProduct[] = products.map(u => ({
+      ...u,
+      _id: u._id.toString(), // 👈 fix type
+    }));
+
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: products,
+      data: normalizedProducts,
       pagination: {
         page,
         limit,
@@ -238,10 +253,15 @@ export class ProductRepository {
       }),
     ]);
 
+    const normalizedProducts: IProduct[] = products.map(u => ({
+      ...u,
+      _id: u._id.toString(), // 👈 fix type
+    }));
+
     const totalPages = Math.ceil(total / limit);
 
     return {
-      data: products,
+      data: normalizedProducts,
       pagination: {
         page,
         limit,

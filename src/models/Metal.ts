@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 import { IMetal, MongooseDocument } from '@/types';
 
 // Product document interface
-export interface IMetalDocument extends Omit<IMetal, '_id'>, Document, MongooseDocument {
+export interface IMetalDocument extends Omit<IMetal, '_id'>, Document {
     toJSON(): IMetal;
 }
 
